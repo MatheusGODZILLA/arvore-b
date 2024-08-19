@@ -53,6 +53,7 @@ int main() {
       free(arvore);
       printf("Saindo...\n");
       exit(EXIT_SUCCESS);
+      break;
 
     default:
       printf("Opção inválida!\n");
