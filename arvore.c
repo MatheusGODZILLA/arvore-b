@@ -36,76 +36,84 @@ ArvoreB *criarArvoreB() {
 
 // Função para dividir um nó filho
 void dividirFilho(No *pai, int i, No *filho) {
-  No *novoFilho = criarNo(filho->folha);
-  novoFilho->numChaves = ORDEM / 2;
-
-  for (int j = 0; j < ORDEM / 2; j++) {
-    novoFilho->chaves[j] = filho->chaves[j + ORDEM / 2];
-  }
-
-  if (!filho->folha) {
-    for (int j = 0; j <= ORDEM / 2; j++) {
-      novoFilho->filhos[j] = filho->filhos[j + ORDEM / 2];
+    int t = ORDEM / 2;
+    
+    No *novoFilho = criarNo(filho->folha);
+    novoFilho->numChaves = t - 1;
+    
+    for (int j = 0; j < t - 1; j++) {
+        novoFilho->chaves[j] = filho->chaves[j + t];
     }
-  }
-
-  filho->numChaves = ORDEM / 2 - 1;
-
-  for (int j = pai->numChaves; j >= i + 1; j--) {
-    pai->filhos[j + 1] = pai->filhos[j];
-  }
-
-  pai->filhos[i + 1] = novoFilho;
-
-  for (int j = pai->numChaves - 1; j >= i; j--) {
-    pai->chaves[j + 1] = pai->chaves[j];
-  }
-
-  pai->chaves[i] = filho->chaves[ORDEM / 2 - 1];
-  pai->numChaves++;
+    
+    if (!filho->folha) {
+        for (int j = 0; j < t; j++) {
+            novoFilho->filhos[j] = filho->filhos[j + t];
+        }
+    }
+    
+    filho->numChaves = t - 1;  // Reduzir o número de chaves em filho
+    
+    for (int j = pai->numChaves; j >= i + 1; j--) {
+        pai->filhos[j + 1] = pai->filhos[j];
+    }
+    
+    pai->filhos[i + 1] = novoFilho;
+    
+    // Mover as chaves de pai para abrir espaço para a chave do meio de filho
+    for (int j = pai->numChaves - 1; j >= i; j--) {
+        pai->chaves[j + 1] = pai->chaves[j];
+    }
+    
+    pai->chaves[i] = filho->chaves[t - 1];
+    
+    pai->numChaves++;
 }
 
 // Função para inserir uma chave em um nó não cheio
 void inserirNaoCheio(No *no, int chave) {
-  int i = no->numChaves - 1;
-
-  if (no->folha) {
-    while (i >= 0 && no->chaves[i] > chave) {
-      no->chaves[i + 1] = no->chaves[i];
-      i--;
+    int i = no->numChaves - 1;
+    
+    if (no->folha) {
+        while (i >= 0 && no->chaves[i] > chave) {
+            no->chaves[i + 1] = no->chaves[i];
+            i--;
+        }
+        no->chaves[i + 1] = chave;
+        no->numChaves++;
+    } else {
+        // Encontrar o filho que receberá a nova chave
+        while (i >= 0 && no->chaves[i] > chave) {
+            i--;
+        }
+        i++;        
+        // Se o filho encontrado está cheio, divida-o
+        if (no->filhos[i]->numChaves == ORDEM - 1) {
+            dividirFilho(no, i, no->filhos[i]);
+            
+            if (no->chaves[i] < chave) {
+                i++;
+            }
+        }
+        inserirNaoCheio(no->filhos[i], chave);
     }
-    no->chaves[i + 1] = chave;
-    no->numChaves++;
-  } else {
-    while (i >= 0 && no->chaves[i] > chave) {
-      i--;
-    }
-    i++;
-    if (no->filhos[i]->numChaves == ORDEM - 1) {
-      dividirFilho(no, i, no->filhos[i]);
-      if (no->chaves[i] < chave) {
-        i++;
-      }
-    }
-    inserirNaoCheio(no->filhos[i], chave);
-  }
 }
 
 // Função para inserir uma chave na árvore B
 void inserir(ArvoreB *arvore, int chave) {
-  if (arvore->raiz == NULL) {
-    arvore->raiz = criarNo(1);
-  }
-  if (arvore->raiz->numChaves == ORDEM - 1) {
-    No *novoNo = criarNo(0);
-    arvore->raiz = novoNo;
-    novoNo->filhos[0] = arvore->raiz;
-    dividirFilho(novoNo, 0, arvore->raiz);
-    inserirNaoCheio(novoNo, chave);
-  } else {
-    inserirNaoCheio(arvore->raiz, chave);
-  }
+    No *raiz = arvore->raiz;
+    
+    // Se a raiz está cheia, a árvore deve crescer em altura
+    if (raiz->numChaves == ORDEM - 1) {
+        No *novoNo = criarNo(0);
+        novoNo->filhos[0] = raiz;
+        arvore->raiz = novoNo;
+        dividirFilho(novoNo, 0, raiz);
+        inserirNaoCheio(novoNo, chave);
+    } else {
+        inserirNaoCheio(raiz, chave);
+    }
 }
+
 
 No *buscar(No *no, int chave) {
   int i = 0;
@@ -124,10 +132,9 @@ No *buscar(No *no, int chave) {
 // Função para imprimir a árvore B
 void imprimirArvore(No *no, int nivel) {
   if (no != NULL) {
-    for (int i = 0; i < nivel; i++) {
-      printf("  ");
-    }
-    printf("[");
+    // Imprimir as chaves no nível atual
+    printf("%*s", nivel * 4, ""); // Adicionar indentação
+    printf("Nivel %d: [", nivel);
     for (int i = 0; i < no->numChaves; i++) {
       printf("%d", no->chaves[i]);
       if (i < no->numChaves - 1) {
@@ -135,15 +142,18 @@ void imprimirArvore(No *no, int nivel) {
       }
     }
     printf("]\n");
+
+    // Imprimir os filhos se não for folha
     if (!no->folha) {
       for (int i = 0; i <= no->numChaves; i++) {
         imprimirArvore(no->filhos[i], nivel + 1);
       }
     }
   } else {
-    printf("A árvore está vazia.\n");
+    printf("A arvore esta vazia.\n");
   }
 }
+
 
 // Função para liberar a memória de um nó
 void liberarNo(No *no) {

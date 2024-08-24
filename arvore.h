@@ -2,7 +2,7 @@
 #define ARVORE_H
 
 // Ordem da Árvore B
-#define ORDEM 3
+#define ORDEM 6
 
 typedef struct No {
   int chaves[ORDEM - 1];    // Chaves dos nós internos

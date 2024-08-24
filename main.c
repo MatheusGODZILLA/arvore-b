@@ -1,6 +1,7 @@
 #include "arvore.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 void exibirMenu() {
   printf("\nMenu:\n");
@@ -10,6 +11,48 @@ void exibirMenu() {
   printf("4. Imprimir Árvore\n");
   printf("5. Sair\n");
   printf("Escolha uma opção: ");
+}
+
+void medirTempoInsercao(ArvoreB *arvore, int valor) {
+  clock_t inicio, fim;
+  double tempo_gasto;
+
+  inicio = clock();
+  inserir(arvore, valor);
+  fim = clock();
+
+  tempo_gasto = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
+  printf("Tempo de execução para inserção: %f segundos\n", tempo_gasto);
+}
+
+void medirTempoBusca(ArvoreB *arvore, int valor) {
+  clock_t inicio, fim;
+  double tempo_gasto;
+
+  inicio = clock();
+  No *resultado = buscar(arvore->raiz, valor);
+  fim = clock();
+
+  tempo_gasto = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
+  printf("Tempo de execução para busca: %f segundos\n", tempo_gasto);
+
+  if (resultado != NULL) {
+    printf("Valor %d encontrado na árvore.\n", valor);
+  } else {
+    printf("Valor %d não encontrado na árvore.\n", valor);
+  }
+}
+
+void medirTempoRemocao(ArvoreB *arvore, int valor) {
+  clock_t inicio, fim;
+  double tempo_gasto;
+
+  inicio = clock();
+  remover(arvore, valor);
+  fim = clock();
+
+  tempo_gasto = ((double)(fim - inicio)) / CLOCKS_PER_SEC;
+  printf("Tempo de execução para remoção: %f segundos\n", tempo_gasto);
 }
 
 int main() {
@@ -24,24 +67,19 @@ int main() {
     case 1:
       printf("Digite o valor a ser inserido: ");
       scanf("%d", &valor);
-      inserir(arvore, valor);
+      medirTempoInsercao(arvore, valor);
       break;
 
     case 2:
       printf("Digite o valor a ser buscado: ");
       scanf("%d", &valor);
-      No *resultado = buscar(arvore->raiz, valor);
-      if (resultado != NULL) {
-        printf("Valor %d encontrado na árvore.\n", valor);
-      } else {
-        printf("Valor %d não encontrado na árvore.\n", valor);
-      }
+      medirTempoBusca(arvore, valor);
       break;
 
     case 3:
       printf("Digite o valor a ser removido: ");
       scanf("%d", &valor);
-      remover(arvore, valor);
+      medirTempoRemocao(arvore, valor);
       break;
 
     case 4:
