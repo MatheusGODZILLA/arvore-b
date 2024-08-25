@@ -14,7 +14,7 @@ void inserirLote(ArvoreB *arvore, int quantidade) {
     srand(time(NULL));
 
     while (tamanho < quantidade) {
-        int valor = rand() % 50000;
+        int valor = rand() % 20000;
 
         if (bsearch(&valor, valores, tamanho, sizeof(int), comparar) == NULL) {
             inserir(arvore, valor);
@@ -45,9 +45,23 @@ void imprimirArvoreNoArquivo(No *no, int nivel, FILE *arquivo) {
     }
 }
 
+size_t calcularUsoMemoria(No *no) {
+    if (no == NULL)
+        return 0;
+
+    size_t memoria = sizeof(No) + (no->numChaves * sizeof(int)) + (ORDEM * sizeof(No *));
+
+    if (!no->folha) {
+        for (int i = 0; i <= no->numChaves; i++) {
+            memoria += calcularUsoMemoria(no->filhos[i]);
+        }
+    }
+    return memoria;
+}
+
 int main() {
     ArvoreB *arvore = criarArvoreB();
-    int quantidade = 25000;
+    int quantidade = 10000;
 
     FILE *arquivo = fopen("arvore.txt", "w");
     if (arquivo == NULL) {
@@ -68,6 +82,9 @@ int main() {
     imprimirArvoreNoArquivo(arvore->raiz, 0, arquivo);
 
     fclose(arquivo);
+
+    size_t memoria_usada = calcularUsoMemoria(arvore->raiz);
+    printf("Uso de memoria da arvore: %zu bytes\n", memoria_usada);
 
     liberarNo(arvore->raiz);
     free(arvore);
