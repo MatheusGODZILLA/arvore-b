@@ -54,7 +54,10 @@ size_t obterUsoMemoria() {
 
 int main() {
     const char *nomeArquivo = "arvore.txt";
-    int valorBuscado = 32760;  // Substitua pelo valor que você deseja buscar
+
+    int valorBuscado;
+    printf("Digite o valor a ser buscado: ");
+    scanf("%d", &valorBuscado);
 
     clock_t inicio, fim;
     double tempo_gasto;
@@ -86,4 +89,4 @@ int main() {
     return 0;
 }
 
-// gcc selecaoNoRep.c arvore.c -o main2 -lpsapi
+// gcc selecao.c arvore.c -o main2 -lpsapi

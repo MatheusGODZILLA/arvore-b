@@ -1,5 +1,6 @@
 #ifndef ARVORE_H
 #define ARVORE_H
+#include <stdio.h>
 
 // Ordem da Árvore B
 #define ORDEM 6

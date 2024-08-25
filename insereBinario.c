@@ -26,20 +26,21 @@ void inserirLote(ArvoreB *arvore, int quantidade) {
     free(valores);
 }
 
-void imprimirArvoreNoArquivo(No *no, int nivel, FILE *arquivo) {
+void salvarArvoreNoBinario(No *no, FILE *arquivo) {
     if (no != NULL) {
-        fprintf(arquivo, "%*sNivel %d: [", nivel * 4, "", nivel);
-        for (int i = 0; i < no->numChaves; i++) {
-            fprintf(arquivo, "%d", no->chaves[i]);
-            if (i < no->numChaves - 1) {
-                fprintf(arquivo, ", ");
-            }
-        }
-        fprintf(arquivo, "]\n");
+        // Escreve se o nó é folha ou não
+        fwrite(&no->folha, sizeof(int), 1, arquivo);
+        
+        // Escreve o número de chaves no nó
+        fwrite(&no->numChaves, sizeof(int), 1, arquivo);
 
+        // Escreve as chaves
+        fwrite(no->chaves, sizeof(int), no->numChaves, arquivo);
+
+        // Se não for folha, grava os filhos
         if (!no->folha) {
             for (int i = 0; i <= no->numChaves; i++) {
-                imprimirArvoreNoArquivo(no->filhos[i], nivel + 1, arquivo);
+                salvarArvoreNoBinario(no->filhos[i], arquivo);
             }
         }
     }
@@ -66,7 +67,7 @@ int main() {
     printf("Digite a quantidade de números a serem inseridos na árvore: ");
     scanf("%d", &quantidade);
 
-    FILE *arquivo = fopen("arvore.txt", "w");
+    FILE *arquivo = fopen("arvore.bin", "wb");
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo!\n");
         return 1;
@@ -82,7 +83,8 @@ int main() {
     tempo_gasto = ((double)(fim - inicio)) * 1000.0 / CLOCKS_PER_SEC;
     printf("Tempo de execucao para insercao de %d numeros: %f ms\n", quantidade, tempo_gasto);
 
-    imprimirArvoreNoArquivo(arvore->raiz, 0, arquivo);
+    // Salva a árvore no arquivo binário
+    salvarArvoreNoBinario(arvore->raiz, arquivo);
 
     fclose(arquivo);
 
@@ -92,6 +94,6 @@ int main() {
     liberarNo(arvore->raiz);
     free(arvore);
 
-    printf("Estrutura da arvore gravada no arquivo arvore.txt\n");
+    printf("Estrutura da arvore gravada no arquivo arvore.bin\n");
     return 0;
 }
