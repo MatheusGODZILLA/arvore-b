@@ -36,10 +36,10 @@ ArvoreB *criarArvoreB() {
 
 // Função para dividir um nó filho
 void dividirFilho(No *pai, int i, No *filho) {
-    int t = ORDEM / 2;
+    int t = (ORDEM+1) / 2;
     
     No *novoFilho = criarNo(filho->folha);
-    novoFilho->numChaves = t - 1;
+    novoFilho->numChaves = ORDEM - t - 1;
     
     for (int j = 0; j < t - 1; j++) {
         novoFilho->chaves[j] = filho->chaves[j + t];
@@ -229,22 +229,24 @@ void removerDeFolha(No *no, int idx) {
 }
 
 // Função para remover uma chave de um nó não folha
+// Função para remover uma chave de um nó não folha
 void removerDeNaoFolha(No *no, int idx) {
-  int chave = no->chaves[idx];
+    int chave = no->chaves[idx];
 
-  if (no->filhos[idx]->numChaves >= ORDEM / 2) {
-    int antecessor = pegarAntecessor(no, idx);
-    no->chaves[idx] = antecessor;
-    removerDeNo(no->filhos[idx], antecessor);
-  } else if (no->filhos[idx + 1]->numChaves >= ORDEM / 2) {
-    int sucessor = pegarSucessor(no, idx);
-    no->chaves[idx] = sucessor;
-    removerDeNo(no->filhos[idx + 1], sucessor);
-  } else {
-    fundir(no, idx);
-    removerDeNo(no->filhos[idx], chave);
-  }
+    if (no->filhos[idx + 1]->numChaves >= ORDEM / 2) {
+        int sucessor = pegarSucessor(no, idx);
+        no->chaves[idx] = sucessor;
+        removerDeNo(no->filhos[idx + 1], sucessor);
+    } else if (no->filhos[idx]->numChaves >= ORDEM / 2) {
+        int antecessor = pegarAntecessor(no, idx);
+        no->chaves[idx] = antecessor;
+        removerDeNo(no->filhos[idx], antecessor);
+    } else {
+        fundir(no, idx);
+        removerDeNo(no->filhos[idx], chave);
+    }
 }
+
 
 // Função para pegar o antecessor de uma chave
 int pegarAntecessor(No *no, int idx) {
