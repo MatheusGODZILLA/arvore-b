@@ -14,7 +14,7 @@ void inserirLote(ArvoreB *arvore, int quantidade) {
     srand(time(NULL));
 
     while (tamanho < quantidade) {
-        int valor = rand() % 100;
+        int valor = rand() % (quantidade*2);
 
         if (bsearch(&valor, valores, tamanho, sizeof(int), comparar) == NULL) {
             inserir(arvore, valor);
@@ -64,7 +64,7 @@ int main() {
     ArvoreB *arvore = criarArvoreB();
     int quantidade;
 
-    printf("Digite a quantidade de números a serem inseridos na árvore: ");
+    printf("Digite a quantidade de numeros a serem inseridos na arvore: ");
     scanf("%d", &quantidade);
 
     FILE *arquivo = fopen("arvore.bin", "wb");
