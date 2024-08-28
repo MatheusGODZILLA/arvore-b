@@ -14,7 +14,7 @@ void inserirLote(ArvoreB *arvore, int quantidade) {
     srand(time(NULL));
 
     while (tamanho < quantidade) {
-        int valor = rand() % (quantidade*2);
+        int valor = rand() % (quantidade * 2);
 
         if (bsearch(&valor, valores, tamanho, sizeof(int), comparar) == NULL) {
             inserir(arvore, valor);
@@ -30,7 +30,7 @@ void salvarArvoreNoBinario(No *no, FILE *arquivo) {
     if (no != NULL) {
         // Escreve se o nó é folha ou não
         fwrite(&no->folha, sizeof(int), 1, arquivo);
-        
+
         // Escreve o número de chaves no nó
         fwrite(&no->numChaves, sizeof(int), 1, arquivo);
 
@@ -60,6 +60,31 @@ size_t calcularUsoMemoria(No *no) {
     return memoria;
 }
 
+// Função para imprimir a árvore B
+void imprimirArvoreB(No *no, int nivel) {
+    if (no != NULL) {
+        // Imprime a indentação correspondente ao nível
+        for (int i = 0; i < nivel; i++) {
+            printf("    "); // Indenta de acordo com o nível
+        }
+
+        // Imprime as chaves do nó atual
+        printf("| ");
+        for (int i = 0; i < no->numChaves; i++) {
+            printf("%d ", no->chaves[i]);
+        }
+        printf("|\n");
+
+        // Se não for folha, imprime os filhos com um nível maior de indentação
+        if (!no->folha) {
+            for (int i = 0; i <= no->numChaves; i++) {
+                imprimirArvoreB(no->filhos[i], nivel + 1);
+            }
+        }
+    }
+}
+
+
 int main() {
     ArvoreB *arvore = criarArvoreB();
     int quantidade;
@@ -82,6 +107,10 @@ int main() {
 
     tempo_gasto = ((double)(fim - inicio)) * 1000.0 / CLOCKS_PER_SEC;
     printf("Tempo de execucao para insercao de %d numeros: %f ms\n", quantidade, tempo_gasto);
+
+    // Imprime a árvore B gerada na tela
+    printf("\nEstrutura da Arvore B:\n");
+    imprimirArvoreB(arvore->raiz, 0);
 
     // Salva a árvore no arquivo binário
     salvarArvoreNoBinario(arvore->raiz, arquivo);

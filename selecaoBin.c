@@ -5,6 +5,30 @@
 #include <windows.h>
 #include <psapi.h>
 
+// Função recursiva para buscar o valor no arquivo binário
+int buscarValorNoBinarioRecursivo(FILE *arquivo, int valorBuscado) {
+    int folha, numChaves, valor;
+    fread(&folha, sizeof(int), 1, arquivo);
+    fread(&numChaves, sizeof(int), 1, arquivo);
+
+    for (int i = 0; i < numChaves; i++) {
+        fread(&valor, sizeof(int), 1, arquivo);
+        if (valor == valorBuscado) {
+            return 1;
+        }
+    }
+
+    if (!folha) {
+        for (int i = 0; i <= numChaves; i++) {
+            if (buscarValorNoBinarioRecursivo(arquivo, valorBuscado)) {
+                return 1;
+            }
+        }
+    }
+
+    return 0;
+}
+
 // Função para buscar o valor no arquivo binário
 int buscarValorNoArquivoBinario(const char *nomeArquivo, int valorBuscado) {
     FILE *arquivo = fopen(nomeArquivo, "rb");
@@ -13,33 +37,10 @@ int buscarValorNoArquivoBinario(const char *nomeArquivo, int valorBuscado) {
         return -1;  // Retorna -1 para indicar erro na abertura do arquivo
     }
 
-    int folha, numChaves, valor;
-    int encontrado = 0;
-
-    // Percorre o arquivo lendo os nós da árvore
-    while (fread(&folha, sizeof(int), 1, arquivo) == 1) {
-        fread(&numChaves, sizeof(int), 1, arquivo);
-        for (int i = 0; i < numChaves; i++) {
-            fread(&valor, sizeof(int), 1, arquivo);
-            if (valor == valorBuscado) {
-                encontrado = 1;
-                break;
-            }
-        }
-
-        if (encontrado) {
-            break;
-        }
-
-        // Pula os filhos (se não for folha)
-        if (!folha) {
-            fseek(arquivo, (numChaves + 1) * sizeof(int*), SEEK_CUR);
-        }
-    }
-
+    int resultado = buscarValorNoBinarioRecursivo(arquivo, valorBuscado);
     fclose(arquivo);
 
-    return encontrado ? 0 : -1;  // Retorna 0 se o valor foi encontrado, -1 caso contrário
+    return resultado ? 0 : -1;  // Retorna 0 se o valor foi encontrado, -1 caso contrário
 }
 
 // Função para obter o uso de memória em sistemas Windows
