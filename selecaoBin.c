@@ -4,6 +4,9 @@
 #include <time.h>
 #include <windows.h>
 #include <psapi.h>
+#include "arvore.h"
+#include "arvore.h"
+#include "atualizacaoBin.c"
 
 // Função recursiva para buscar o valor no arquivo binário
 int buscarValorNoBinarioRecursivo(FILE *arquivo, int valorBuscado) {
@@ -80,7 +83,7 @@ int main() {
         printf("Valor %d encontrado no arquivo %s.\n", valorBuscado, nomeArquivo);
     } else {
         printf("Valor %d nao encontrado no arquivo %s.\n", valorBuscado, nomeArquivo);
-    }
+    }   
 
     printf("Uso de memoria antes da busca: %zu KB\n", memoriaAntes);
     printf("Uso de memoria depois da busca: %zu KB\n", memoriaDepois);

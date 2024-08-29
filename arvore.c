@@ -229,7 +229,6 @@ void removerDeFolha(No *no, int idx) {
 }
 
 // Função para remover uma chave de um nó não folha
-// Função para remover uma chave de um nó não folha
 void removerDeNaoFolha(No *no, int idx) {
     int chave = no->chaves[idx];
 

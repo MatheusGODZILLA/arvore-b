@@ -37,4 +37,12 @@ void pegarDoAnterior(No *no, int idx);
 void pegarDoProximo(No *no, int idx);
 void fundir(No *no, int idx);
 
+// funcoes binarias 
+
+void inserirLote(ArvoreB *arvore, int quantidade);
+int comparar(const void *a, const void *b);
+void salvarArvoreNoBinario(No *no, FILE *arquivo);
+size_t calcularUsoMemoria(No *no);
+void imprimirArvoreB(No *no, int nivel); 
+
 #endif // ARVORE_H

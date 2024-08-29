@@ -85,7 +85,7 @@ void imprimirArvoreB(No *no, int nivel) {
 }
 
 
-int main() {
+int mai1n() {
     ArvoreB *arvore = criarArvoreB();
     int quantidade;
 

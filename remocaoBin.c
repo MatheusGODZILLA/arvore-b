@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "arvore.h"
+#include "insereBinario.c"
 
 // Função para carregar um nó do arquivo binário
 No* carregarNoDeBinario(FILE *arquivo) {
@@ -82,25 +84,21 @@ No* buscarNoParaAtualizacao(No* no, int chave) {
     return buscarNoParaAtualizacao(no->filhos[i], chave);
 }
 
-// Função para atualizar uma chave existente
-void atualizarChaveBinario(ArvoreB *arvore, int chaveAntiga, int chaveNova, const char *nomeArquivo) {
+// Função para remover uma chave existente e imprimir a árvore
+void removerChaveBinario(ArvoreB *arvore, int chaveParaRemover, const char *nomeArquivo) {
     // Carregar a árvore do arquivo binário
     carregarArvoreDoArquivoBinario(arvore, nomeArquivo);
 
-    No *no = buscarNoParaAtualizacao(arvore->raiz, chaveAntiga);
+    // Buscar o nó que contém a chave para remover
+    No *no = buscarNoParaAtualizacao(arvore->raiz, chaveParaRemover);
 
     if (no != NULL) {
-        // Verifica se a nova chave já existe na árvore (para evitar duplicatas)
-        No *noExistente = buscarNoParaAtualizacao(arvore->raiz, chaveNova);
-        if (noExistente != NULL) {
-            printf("A chave %d já existe na árvore. Atualização cancelada.\n", chaveNova);
-            return;
-        }
+        // Remover a chave da árvore
+        remover(arvore, chaveParaRemover);
 
-        // Remove a chave antiga
-        remover(arvore, chaveAntiga);
-        // Insere a nova chave
-        inserir(arvore, chaveNova);
+        // Imprimir a árvore B após a remoção
+        printf("\nEstrutura da Arvore B apos remocao:\n");
+        imprimirArvoreB(arvore->raiz, 0);
 
         // Salvar a árvore atualizada no arquivo binário
         FILE *arquivo = fopen(nomeArquivo, "wb");
@@ -112,24 +110,22 @@ void atualizarChaveBinario(ArvoreB *arvore, int chaveAntiga, int chaveNova, cons
         salvarArvoreNoArquivoBinario(arvore->raiz, arquivo);
         fclose(arquivo);
 
-        printf("Chave %d atualizada para %d com sucesso.\n", chaveAntiga, chaveNova);
+        printf("Chave %d removida com sucesso.\n", chaveParaRemover);
     } else {
-        printf("Chave %d não encontrada na árvore.\n", chaveAntiga);
+        printf("Chave %d não encontrada na árvore.\n", chaveParaRemover);
     }
 }
 
-int main1() {
+int main() {
     ArvoreB *arvore = criarArvoreB();
     const char *nomeArquivo = "arvore.bin";
 
-    int chaveAntiga, chaveNova;
+    int chaveParaRemover;
 
-    printf("Digite a chave a ser atualizada: ");
-    scanf("%d", &chaveAntiga);
-    printf("Digite a nova chave: ");
-    scanf("%d", &chaveNova);
+    printf("Digite a chave a ser removida: ");
+    scanf("%d", &chaveParaRemover);
 
-    atualizarChaveBinario(arvore, chaveAntiga, chaveNova, nomeArquivo);
+    removerChaveBinario(arvore, chaveParaRemover, nomeArquivo);
 
     // Liberar memória
     liberarNo(arvore->raiz);
